@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "78735092149",
+    "project_id": "iotinspace",
+    "storage_bucket": "iotinspace.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:78735092149:android:0c33352f1ef17d70c6d1fc",
+        "android_client_info": {
+          "package_name": "com.example.taapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9EwsVoUD9z7lsHf6QWbbNFXwT9geeq14"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
