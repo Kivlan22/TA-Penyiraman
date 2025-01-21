@@ -11,7 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.taapp.R
 
-class AuthActivity : AppCompatActivity() {
+    class AuthActivity : AppCompatActivity() {
 
     private lateinit var name: String
     private lateinit var email: String

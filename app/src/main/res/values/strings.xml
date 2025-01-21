@@ -2,4 +2,13 @@
     <string name="app_name">TA APP</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="camera_options">
+        <item>Kamera 1</item>
+        <item>Kamera 2</item>
+    </string-array>
+
+    <string name="mapbox_access_token">YOUR_MAPBOX_ACCESS_TOKEN</string>
+
+
 </resources>

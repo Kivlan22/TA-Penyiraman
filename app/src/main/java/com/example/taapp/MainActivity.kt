@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import com.example.taapp.Camera.Kamera
 import com.example.taapp.Home.Home
 import com.example.taapp.Controlling.Controlling
+import com.example.taapp.Help.Help
 import com.example.taapp.Profile.Profile
 import com.example.taapp.databinding.ActivityMainBinding
 

@@ -1,70 +1,120 @@
 package com.example.taapp.Camera
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import android.widget.Switch
 import androidx.fragment.app.Fragment
 import com.example.taapp.R
-import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
 
 class Kamera : Fragment() {
 
-    private lateinit var player: ExoPlayer
-    private lateinit var playerView: PlayerView
+    private lateinit var videoWebView: WebView
+    private lateinit var cameraSpinner: Spinner
+    private lateinit var toggleSwitch: Switch
+
+    // URL stream untuk kamera
+    private val cameraUrls = listOf(
+        "https://livefeed.cameraiot.online/?action=stream1", // Kamera 1
+        "https://livefeed.cameraiot.online/?action=stream2"  // Kamera 2
+    )
+
+    // Nama kamera
+    private val cameraNames = listOf("Kamera 1", "Kamera 2")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_kamera, container, false)
+        // Inflate the layout for this fragment
+        val binding = inflater.inflate(R.layout.fragment_kamera, container, false)
 
-        playerView = view.findViewById(R.id.playerView)
+        // Inisialisasi WebView, Spinner, dan Toggle Switch
+        videoWebView = binding.findViewById(R.id.videoWebView)
+        cameraSpinner = binding.findViewById(R.id.cameraSpinner)
+        toggleSwitch = binding.findViewById(R.id.toggleSwitch)
 
-        // Inisialisasi player hanya jika belum ada player yang terbuat
-        if (!::player.isInitialized) {
-            player = ExoPlayer.Builder(requireContext()).build()
-            playerView.player = player
+        // Matikan video dan set toggle switch ke OFF saat navigasi ke fragment
+        toggleSwitch.isChecked = false
+        videoWebView.visibility = View.GONE
+        videoWebView.stopLoading()
 
-            // Set media item (video URL)
-            val mediaItem = MediaItem.fromUri(
-                Uri.parse("https://eofficev2.bekasikota.go.id/backupcctv/m3/Samping_RS_Mitra_Keluarga.m3u8")
-            )
-            player.setMediaItem(mediaItem)
-            player.prepare()
-        }
+        // Mengonfigurasi WebView
+        setupWebView()
 
-        // Play video jika belum diputar
-        if (!player.isPlaying) {
-            player.play()
-        }
+        // Mengatur adapter dan listener untuk Spinner
+        setupSpinner()
 
-        return view
+        // Menambahkan listener untuk Toggle Switch
+        setupToggleSwitch()
+
+        return binding
     }
 
-    override fun onPause() {
-        super.onPause()
-        // Pause video saat fragment dipause
-        if (player.isPlaying) {
-            player.pause()
+    private fun setupWebView() {
+        // Mengaktifkan JavaScript untuk memuat konten video
+        videoWebView.settings.javaScriptEnabled = true
+        videoWebView.webViewClient = WebViewClient()  // Agar URL dibuka di dalam WebView
+
+        // Memuat URL awal (default Kamera 1)
+        videoWebView.loadUrl(cameraUrls[0])
+    }
+
+    private fun setupSpinner() {
+        // Membuat adapter untuk Spinner
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            cameraNames
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        // Menghubungkan adapter ke Spinner
+        cameraSpinner.adapter = adapter
+
+        // Menambahkan listener untuk Spinner
+        cameraSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                // Memuat URL berdasarkan pilihan kamera jika toggle switch ON
+                if (toggleSwitch.isChecked) {
+                    videoWebView.loadUrl(cameraUrls[position])
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Tidak ada aksi yang diperlukan
+            }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Lanjutkan video saat fragment resume
-        if (!player.isPlaying) {
-            player.play()
+    private fun setupToggleSwitch() {
+        toggleSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                // Toggle ON: Nyalakan WebView
+                videoWebView.visibility = View.VISIBLE
+                videoWebView.loadUrl(cameraUrls[cameraSpinner.selectedItemPosition])
+            } else {
+                // Toggle OFF: Matikan WebView
+                videoWebView.visibility = View.GONE
+                videoWebView.stopLoading()
+            }
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-
-        // Melepaskan player saat fragment dihancurkan
-        player.release()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Hentikan WebView saat fragment dihancurkan
+        videoWebView.destroy()
     }
 }

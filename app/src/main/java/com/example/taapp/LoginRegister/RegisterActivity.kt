@@ -1,109 +1,104 @@
 package com.example.taapp.LoginRegister
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.taapp.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import android.widget.Button
+import android.widget.EditText
 
 class RegisterActivity : AppCompatActivity() {
 
-    private lateinit var nameField: EditText
-    private lateinit var emailField: EditText
-    private lateinit var passField: EditText
-    private lateinit var confPassField: EditText
-    private lateinit var iotcode: EditText
-    private lateinit var phoneField: EditText
+    private lateinit var auth: FirebaseAuth
+    private val database = FirebaseDatabase.getInstance().reference
 
-    @SuppressLint("MissingInflatedId")
+    private lateinit var nameInput: EditText
+    private lateinit var emailInput: EditText
+    private lateinit var passwordInput: EditText
+    private lateinit var confPasswordInput: EditText
+    private lateinit var iotCodeInput: EditText
+    private lateinit var phoneInput: EditText
+    private lateinit var registerButton: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start_register1)
 
-        window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance()
 
-        // Inisialisasi input field
-        nameField = findViewById(R.id.nama)
-        emailField = findViewById(R.id.email)
-        passField = findViewById(R.id.pass)
-        confPassField = findViewById(R.id.confpass)
-        iotcode = findViewById(R.id.iotcode)
-        phoneField = findViewById(R.id.conftelp)
+        // Initialize UI elements
+        nameInput = findViewById(R.id.nameInput)
+        emailInput = findViewById(R.id.emailInput)
+        passwordInput = findViewById(R.id.passwordInput)
+        confPasswordInput = findViewById(R.id.confPasswordInput)
+        iotCodeInput = findViewById(R.id.iotCodeInput)
+        phoneInput = findViewById(R.id.confPhone)
+        registerButton = findViewById(R.id.registerButton)
 
-        val signInButton = findViewById<Button>(R.id.signin)
-        val loadingIndicator = findViewById<ProgressBar>(R.id.loading_indicator)
-        val createText = findViewById<TextView>(R.id.create)
+        registerButton.setOnClickListener {
+            val name = nameInput.text.toString().trim()
+            val email = emailInput.text.toString().trim()
+            val password = passwordInput.text.toString().trim()
+            val confPassword = confPasswordInput.text.toString().trim()
+            val iotCode = iotCodeInput.text.toString().trim()
+            val phone = phoneInput.text.toString().trim()
 
-        signInButton.setOnClickListener {
-            val isValid = validateFields()
-
-            if (isValid) {
-                loadingIndicator.visibility = ProgressBar.VISIBLE
-
-                android.os.Handler().postDelayed({
-                    loadingIndicator.visibility = ProgressBar.GONE
-
-                    val intent = Intent(this, AuthActivity::class.java).apply {
-                        putExtra("name", nameField.text.toString())
-                        putExtra("email", emailField.text.toString())
-                        putExtra("password", passField.text.toString())
-                        putExtra("confpass", confPassField.text.toString())
-                        putExtra("iotcode", iotcode.text.toString())
-                        putExtra("phone", phoneField.text.toString())
-                    }
-                    startActivityForResult(intent, 100)
-                }, 3000)
-            } else {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            if (validateInput(name, email, password, confPassword, iotCode, phone)) {
+                registerUser(name, email, password, iotCode, phone)
             }
         }
+    }
 
-        createText.setOnClickListener {
-            val intent = Intent(this, Login1Activity::class.java)
-            startActivity(intent)
+    private fun validateInput(name: String, email: String, password: String, confPassword: String, iotCode: String, phone: String): Boolean {
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confPassword.isEmpty() || iotCode.isEmpty() || phone.isEmpty()) {
+            Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show()
+            return false
         }
-    }
 
-    private fun validateFields(): Boolean {
-        return validateField(nameField, "Name is required") &&
-                validateField(emailField, "Email is required") &&
-                validateField(passField, "Password is required") &&
-                validateField(confPassField, "Confirm Password is required") &&
-                validateField(iotcode, "IoT Code is required") &&
-                validateField(phoneField, "Phone number is required")
-    }
-
-    private fun validateField(field: EditText, errorMessage: String): Boolean {
-        return if (field.text.isEmpty()) {
-            field.error = errorMessage
-            false
-        } else {
-            field.error = null
-            true
+        if (password != confPassword) {
+            Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            return false
         }
+
+        return true
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
-            nameField.setText(data.getStringExtra("name"))
-            emailField.setText(data.getStringExtra("email"))
-            passField.setText(data.getStringExtra("password"))
-            confPassField.setText(data.getStringExtra("confpass"))
-            iotcode.setText(data.getStringExtra("iotcode"))
-            phoneField.setText(data.getStringExtra("phone"))
+    private fun registerUser(name: String, email: String, password: String, iotCode: String, phone: String) {
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val userId = auth.currentUser?.uid
+                if (userId != null) {
+                    val userMap = hashMapOf(
+                        "id" to userId,
+                        "name" to name,
+                        "email" to email,
+                        "iotCode" to iotCode,
+                        "phone" to phone
+                    )
+
+                    database.child("Users").child(userId).setValue(userMap).addOnCompleteListener { dbTask ->
+                        if (dbTask.isSuccessful) {
+                            // Show success toast
+                            Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
+
+                            // Start AuthActivity after successful registration
+                            val intent = Intent(this, AuthActivity::class.java)
+                            startActivity(intent)
+
+                            // Optionally, finish the current activity to prevent going back to it
+                            finish()
+                        } else {
+                            Toast.makeText(this, "Failed to save data: ${dbTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
-
-    @SuppressLint("MissingSuperCall")
-    override fun onBackPressed() {
-        val intent = Intent(this, StartActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 }

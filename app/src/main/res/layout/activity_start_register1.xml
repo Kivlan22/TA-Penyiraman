@@ -49,7 +49,6 @@
             tools:ignore="HardcodedText,MissingConstraints" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- ScrollView to wrap email, password, and phone number fields -->
     <androidx.core.widget.NestedScrollView
         android:layout_marginTop="10dp"
         android:id="@+id/NestedScrollView"
@@ -85,14 +84,13 @@
                 app:hintTextColor="#1F41BB">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/nama"
+                    android:id="@+id/nameInput"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:textColor="#626262" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- TextInputLayout Email -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/email1"
                 android:layout_width="300dp"
@@ -106,7 +104,7 @@
                 app:hintTextColor="#1F41BB">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/email"
+                    android:id="@+id/emailInput"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:inputType="text"
@@ -114,7 +112,6 @@
                     android:drawableRight="@drawable/baseline_email_24" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- TextInputLayout Password -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/pass1"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -130,14 +127,13 @@
                 app:passwordToggleTint="#626262">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/pass"
+                    android:id="@+id/passwordInput"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
                     android:textColor="#626262" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- TextInputLayout Confirm Password -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/pass2"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -153,7 +149,7 @@
                 app:passwordToggleTint="#626262">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/confpass"
+                    android:id="@+id/confPasswordInput"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
@@ -173,7 +169,7 @@
                 app:hintTextColor="#1F41BB">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/iotcode"
+                    android:id="@+id/iotCodeInput"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:inputType="number"
@@ -181,9 +177,8 @@
                     android:drawableRight="@drawable/baseline_code_24"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- TextInputLayout Phone Number -->
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/notelp"
+                android:id="@+id/phoneInput"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
@@ -195,7 +190,7 @@
                 app:hintTextColor="#1F41BB">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/conftelp"
+                    android:id="@+id/confPhone"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:inputType="number"
@@ -205,7 +200,6 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/button_layout2"
         android:layout_width="match_parent"
@@ -214,55 +208,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Sign in Button -->
         <androidx.appcompat.widget.AppCompatButton
             android:layout_marginTop="20dp"
-            android:id="@+id/signin"
+            android:id="@+id/registerButton"
             android:layout_width="300dp"
             android:layout_height="60dp"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:backgroundTint="#1F41BB"
-            android:text="Sign in"
-            android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.451"
-            app:layout_constraintStart_toStartOf="parent"
+            android:text="Register"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="parent"
-            tools:ignore="MissingConstraints,NotSibling"
-            app:layout_constraintBottom_toBottomOf="@+id/NestedScrollView"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Loading ProgressBar -->
-        <ProgressBar
-            android:id="@+id/loading_indicator"
+        <TextView
+            android:layout_marginTop="16dp"
+            android:id="@+id/signInText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="gone"
-            android:indeterminate="true"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:text="Already have an account? Sign in"
+            android:textColor="#1F41BB"
+            android:textSize="14sp"
+            app:layout_constraintTop_toBottomOf="@id/registerButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/signin"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-    <TextView
-        android:id="@+id/create"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Already have an account"
-        android:textColor="#494949"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/button_layout2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
