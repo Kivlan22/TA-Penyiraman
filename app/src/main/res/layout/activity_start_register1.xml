@@ -172,7 +172,7 @@
                     android:id="@+id/iotCodeInput"
                     android:layout_width="300dp"
                     android:layout_height="wrap_content"
-                    android:inputType="number"
+                    android:inputType="text"
                     android:textColor="#626262"
                     android:drawableRight="@drawable/baseline_code_24"/>
             </com.google.android.material.textfield.TextInputLayout>
@@ -222,6 +222,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
 
         <TextView
             android:layout_marginTop="16dp"

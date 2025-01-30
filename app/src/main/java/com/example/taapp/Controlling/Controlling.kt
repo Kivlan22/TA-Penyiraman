@@ -100,23 +100,23 @@ class Controlling : Fragment() {
                 // Show the warning when trying to turn on manual mode while otomatisSwitch is on
                 showManualSwitchWarning()
             } else if (manualSwitch.isChecked) {
-                triggerManualOn()
+                triggerManualOn() // Changed to trigger setManualOn API
                 // Update status text to "On"
                 val statusText = view.findViewById<TextView>(R.id.text3)
-                statusText?.text = "Status: On"
+                statusText?.text = "Status: Off"
             }
         }
 
-        // Set click listener for the "Off" button
+// Set click listener for the "Off" button
         buttonOff.setOnClickListener {
             if (otomatisSwitch.isChecked) {
                 // Show the warning when trying to turn off manual mode while otomatisSwitch is on
                 showManualSwitchWarning()
             } else if (manualSwitch.isChecked) {
-                triggerManualOff()
+                triggerManualOff() // Changed to trigger setManualOff API
                 // Update status text to "Off"
                 val statusText = view.findViewById<TextView>(R.id.text3)
-                statusText?.text = "Status: Off"
+                statusText?.text = "Status: On"
             }
         }
 

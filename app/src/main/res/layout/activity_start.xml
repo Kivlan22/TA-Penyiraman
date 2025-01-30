@@ -29,7 +29,20 @@
         </androidx.appcompat.widget.AppCompatImageView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Title Section -->
+    <!-- ProgressBar Section -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:indeterminate="true"
+        android:layout_marginTop="200dp"
+        app:layout_constraintTop_toBottomOf="@id/iotinspace"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Title and Button Sections -->
     <TextView
         android:id="@+id/iotinspace"
         android:layout_width="match_parent"
@@ -91,7 +104,7 @@
             tools:ignore="MissingConstraints" />
     </androidx.constraintlayout.widget.ConstraintLayout>
     <TextView
-        android:text="Version 0.0.0"
+        android:text="Version 0.5.8 Beta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="112dp"

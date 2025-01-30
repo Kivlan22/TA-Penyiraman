@@ -22,12 +22,15 @@ import com.example.taapp.R
             registerButton.setOnClickListener {
                 val intent = Intent(this, RegisterActivity::class.java)
                 startActivity(intent)
+                // Menambahkan animasi slide dari kiri
+                overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
             }
 
-            // Navigasi ke Login1Activity
             loginButton.setOnClickListener {
                 val intent = Intent(this, Login1Activity::class.java)
                 startActivity(intent)
+                // Menambahkan animasi slide dari kanan
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
             }
         }
 

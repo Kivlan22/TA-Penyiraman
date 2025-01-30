@@ -154,9 +154,14 @@ class Home : Fragment() {
     // Fungsi untuk animasi perubahan kelembaban
     private fun animateHumidityChange(textView: TextView, humidity: Double) {
         val currentText = textView.text.toString()
-        val currentHumidity = currentText.substringBefore("%").toDoubleOrNull() ?: 0.0
+        // Ambil nilai kelembaban yang sudah ditampilkan sebelumnya
+        val currentHumidity = currentText.substringBefore("%").toDoubleOrNull()
 
-        val animator = ValueAnimator.ofFloat(currentHumidity.toFloat(), humidity.toFloat())
+        // Jika currentHumidity null atau tidak valid, gunakan nilai kelembaban baru
+        val startHumidity = currentHumidity ?: humidity
+
+        // Lakukan animasi perubahan dari startHumidity ke humidity baru
+        val animator = ValueAnimator.ofFloat(startHumidity.toFloat(), humidity.toFloat())
         animator.duration = 500 // Durasi animasi dalam milidetik
         animator.addUpdateListener { animation ->
             val animatedValue = animation.animatedValue as Float

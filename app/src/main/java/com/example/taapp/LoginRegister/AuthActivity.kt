@@ -11,7 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.taapp.R
 
-    class AuthActivity : AppCompatActivity() {
+class AuthActivity : AppCompatActivity() {
 
     private lateinit var name: String
     private lateinit var email: String
@@ -34,7 +34,7 @@ import com.example.taapp.R
         val loadingIndicator = findViewById<ProgressBar>(R.id.loading_indicator)
         val countdownText = findViewById<TextView>(R.id.dialog_message)
 
-        // Ambil data dari RegisterActivity
+        // Retrieve data from RegisterActivity
         intent?.let {
             name = it.getStringExtra("name") ?: ""
             email = it.getStringExtra("email") ?: ""
