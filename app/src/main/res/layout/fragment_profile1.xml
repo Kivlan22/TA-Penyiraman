@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Profile.Profile"
+    tools:context=".Profile.Profile1"
     android:background="@drawable/welcome_screen">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -76,7 +76,6 @@
             android:id="@+id/button_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             app:layout_constraintTop_toBottomOf="@id/nameAccount">
 
             <androidx.appcompat.widget.AppCompatButton
@@ -190,7 +189,6 @@
         android:id="@+id/button_layout_logout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
         app:layout_constraintTop_toBottomOf="@id/NestedScrollView"
         tools:layout_editor_absoluteX="1dp">
 

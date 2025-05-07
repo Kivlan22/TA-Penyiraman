@@ -15,7 +15,7 @@ import com.example.taapp.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
-class Profile : Fragment() {
+class Profile1 : Fragment() {
 
     private lateinit var auth: FirebaseAuth
     private val database = FirebaseDatabase.getInstance().reference
@@ -25,10 +25,11 @@ class Profile : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_profile, container, false)
+        val view = inflater.inflate(R.layout.fragment_profile1, container, false)
 
         auth = FirebaseAuth.getInstance()
 
+        val editButton: Button = view.findViewById(R.id.edit)
         val logoutButton: Button = view.findViewById(R.id.logoutButton)
         val nameAccountTextView: TextView = view.findViewById(R.id.nameAccount)
         val emailTextView: TextView = view.findViewById(R.id.emailInput)
@@ -81,6 +82,11 @@ class Profile : Fragment() {
                     Toast.makeText(requireContext(), "Failed to load user data: ${exception.message}", Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+
+        editButton.setOnClickListener {
+            val intent = Intent(requireContext(), Profile2::class.java)
+            startActivity(intent)
         }
 
         // Logout button

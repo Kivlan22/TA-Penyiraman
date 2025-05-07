@@ -107,7 +107,7 @@ class Controlling : Fragment() {
             }
         }
 
-// Set click listener for the "Off" button
+        // Set click listener for the "Off" button
         buttonOff.setOnClickListener {
             if (otomatisSwitch.isChecked) {
                 // Show the warning when trying to turn off manual mode while otomatisSwitch is on

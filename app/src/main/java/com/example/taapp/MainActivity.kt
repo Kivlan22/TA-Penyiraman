@@ -11,7 +11,7 @@ import com.example.taapp.Camera.Kamera
 import com.example.taapp.Home.Home
 import com.example.taapp.Controlling.Controlling
 import com.example.taapp.Help.Help
-import com.example.taapp.Profile.Profile
+import com.example.taapp.Profile.Profile1
 import com.example.taapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.help -> replaceFragment(Help())
                 R.id.monitoring -> replaceFragment(Controlling())
                 R.id.kamera -> replaceFragment(Kamera())
-                R.id.profile -> replaceFragment(Profile())
+                R.id.profile -> replaceFragment(Profile1())
                 else -> false
             }
             true
