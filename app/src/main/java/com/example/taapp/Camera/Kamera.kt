@@ -22,7 +22,7 @@ class Kamera : Fragment() {
     // URL stream untuk kamera
     private val cameraUrls = listOf(
         "https://livefeed.cameraiot.online/?action=stream1", // Kamera 1
-        "https://livefeed.cameraiot.online/?action=stream2"  // Kamera 2
+        "https://livefeed2.cameraiot.online/?action=stream2"  // Kamera 2
     )
 
     // Nama kamera
