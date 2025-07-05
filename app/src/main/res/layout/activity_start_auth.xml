@@ -26,18 +26,29 @@
         android:id="@+id/dialog_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Get your code on your"
+        android:text="Get your code on your phone"
         android:textSize="16sp"
         android:textColor="@color/black"
         android:gravity="center"
         android:layout_marginBottom="24dp" />
 
-    <!-- TextInputLayout Centered -->
+    <!-- Countdown Text -->
+    <TextView
+        android:id="@+id/countdown_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resend available in 20 seconds"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"/>
+
+    <!-- TextInputLayout for OTP input -->
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/email1"
+        android:id="@+id/otp_input_layout"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:hint="Code"
+        android:hint="Enter OTP"
         android:textColorHint="#626262"
         android:background="#F1F4FF"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -46,12 +57,13 @@
         android:layout_marginTop="40dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/auth"
+            android:id="@+id/otp_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
             android:textColor="#626262"
-            android:drawableRight="@drawable/baseline_email_24" />
+            android:drawableRight="@drawable/baseline_email_24"
+            android:gravity="center"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- ProgressBar for loading -->
@@ -70,6 +82,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp">
 
+        <!-- Resend OTP Button -->
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/resend"
             android:layout_width="160dp"
@@ -84,6 +97,7 @@
             app:layout_constraintEnd_toStartOf="@+id/confirm"
             tools:ignore="MissingConstraints" />
 
+        <!-- Confirm Button -->
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/confirm"
             android:layout_width="160dp"
@@ -97,4 +111,5 @@
             app:layout_constraintEnd_toEndOf="parent"
             tools:ignore="MissingConstraints" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </LinearLayout>

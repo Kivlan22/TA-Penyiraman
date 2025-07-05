@@ -24,4 +24,11 @@
         app:itemRippleColor="#1F41BB"
         app:itemIconTint="#303640"
         app:itemTextColor="#303640"/>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
 </RelativeLayout>

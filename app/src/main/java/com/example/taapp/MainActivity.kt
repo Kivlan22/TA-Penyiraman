@@ -1,18 +1,19 @@
 package com.example.taapp
 
-import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.taapp.Camera.Kamera
-import com.example.taapp.Home.Home
 import com.example.taapp.Controlling.Controlling
 import com.example.taapp.Help.Help
+import com.example.taapp.Home.Home
 import com.example.taapp.Profile.Profile1
 import com.example.taapp.databinding.ActivityMainBinding
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,10 +21,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         replaceFragment(Home())
-        enableEdgeToEdge()
+        setupBottomNavigation()
+
+        subscribeToFirebaseTopic()
+        getFirebaseToken()
+    }
+
+    private fun setupBottomNavigation() {
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.home -> replaceFragment(Home())
@@ -31,57 +40,67 @@ class MainActivity : AppCompatActivity() {
                 R.id.monitoring -> replaceFragment(Controlling())
                 R.id.kamera -> replaceFragment(Kamera())
                 R.id.profile -> replaceFragment(Profile1())
-                else -> false
             }
             true
         }
         binding.bottomNavigationView.selectedItemId = R.id.home
     }
 
-    // Helper method to replace fragments
     private fun replaceFragment(fragment: Fragment): Boolean {
         val fragmentManager = supportFragmentManager
         val currentFragment = fragmentManager.findFragmentById(R.id.frame_layout)
-
-        // Check if the fragment is not already the current one
         if (currentFragment?.javaClass != fragment::class.java) {
-            val fragmentTransaction = fragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.frame_layout, fragment)
-            fragmentTransaction.addToBackStack(null)  // Add to back stack
-            fragmentTransaction.commit()
+            val transaction = fragmentManager.beginTransaction()
+            transaction.replace(R.id.frame_layout, fragment)
+            transaction.addToBackStack(null)
+            transaction.commit()
             return true
         }
         return false
     }
 
-    @Deprecated("This method has been deprecated in favor of using the\n      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.\n      The OnBackPressedDispatcher controls how back button events are dispatched\n      to one or more {@link OnBackPressedCallback} objects.")
-    @SuppressLint("MissingSuperCall")
+    private fun subscribeToFirebaseTopic() {
+        FirebaseMessaging.getInstance().subscribeToTopic("human-detection")
+            .addOnCompleteListener { task ->
+                val status = if (task.isSuccessful) "Berhasil" else "Gagal"
+                Log.d("FCM", "Subscribe ke topik human-detection: $status")
+            }
+    }
+
+    private fun getFirebaseToken() {
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("FCM", "Token: ${task.result}")
+                } else {
+                    Log.e("FCM", "Gagal mendapatkan token", task.exception)
+                }
+            }
+    }
+
+    @Deprecated("Use OnBackPressedDispatcher instead.")
     override fun onBackPressed() {
+        super.onBackPressed()
         val dialogView = layoutInflater.inflate(R.layout.custom_dialog, null)
-        // Initialize the view from the layout
         val dialogTitle = dialogView.findViewById<TextView>(R.id.dialog_title)
         val dialogMessage = dialogView.findViewById<TextView>(R.id.dialog_message)
         val btnPositive = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_positive)
         val btnNegative = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_negative)
 
-        // Create the dialog
         val alertDialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setCancelable(false)
             .create()
 
-        // Action for "Yes" button
         btnPositive.setOnClickListener {
-            finishAffinity() // Close all activities and exit the app
+            finishAffinity()
             alertDialog.dismiss()
         }
 
-        // Action for "No" button
         btnNegative.setOnClickListener {
-            alertDialog.dismiss() // Dismiss the dialog
+            alertDialog.dismiss()
         }
 
-        // Show the dialog
         alertDialog.show()
     }
 }

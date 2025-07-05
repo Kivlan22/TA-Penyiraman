@@ -2,35 +2,52 @@ package com.example.taapp.Home
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.taapp.R
+import com.example.taapp.Home.DetailCuaca.HomeCuaca
+import com.example.taapp.Home.Log.LogCollector
+import com.example.taapp.Home.Log.LogMonitoringDialog
 import com.example.tugas2_mobile_kivlanhakeemarrouf_1103213073_tk4506.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class Home : Fragment() {
 
-    private lateinit var kelembabanTextView1: TextView // Kelembaban Sensor 1
-    private lateinit var kelembabanTextView2: TextView // Kelembaban Sensor 2
-    private lateinit var kelembabanTextView3: TextView // Kelembaban Avg Sensor 3
-    private lateinit var toggleSwitch: Switch // Switch untuk menyalakan/mematikan API
-    private val handler = Handler() // Handler untuk menangani pembaruan berulang
-    private val interval: Long = 500 // Interval waktu dalam milidetik (5 detik)
-    private var isRunning = false // Flag untuk menghentikan atau melanjutkan simulasi
+    private lateinit var kelembabanTextView1: TextView
+    private lateinit var kelembabanTextView2: TextView
+    private lateinit var kelembabanTextView3: TextView
+    private lateinit var temperatureTextView: TextView
+    private lateinit var toggleSwitch: Switch
+    private lateinit var detailCuaca: ImageView
+    private lateinit var infoIcon1: ImageView
 
-    private var activeToast: Toast? = null // Variabel untuk menyimpan referensi Toast yang aktif
-    private var lastErrorTime: Long = 0 // Waktu terakhir pesan kesalahan ditampilkan
+    private val handler = Handler()
+    private val interval: Long = 500
+    private var isRunning = false
+    private var apiCallInProgress = false
 
-    private var apiCallInProgress = false // Flag untuk mengecek apakah API sedang dipanggil
+    private var activeToast: Toast? = null
+    private var lastErrorTime: Long = 0
+
+    private var startTimeSensor1: Long = 0
+    private var startTimeSensor2: Long = 0
+    private var startTimeSensor3: Long = 0
+    private var startTimeBMKG: Long = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,178 +55,239 @@ class Home : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        // Inisialisasi TextView untuk menampilkan kelembaban
         kelembabanTextView1 = view.findViewById(R.id.kelembaban1)
         kelembabanTextView2 = view.findViewById(R.id.kelembaban2)
         kelembabanTextView3 = view.findViewById(R.id.kelembaban3)
-
-        // Inisialisasi Switch untuk mengontrol pemanggilan API
+        temperatureTextView = view.findViewById(R.id.temperature)
         toggleSwitch = view.findViewById(R.id.toggleSwitch)
+        detailCuaca = view.findViewById(R.id.infoIcon)
+        infoIcon1 = view.findViewById(R.id.infoIcon1)
 
-        // Set listener untuk switch
         toggleSwitch.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                startRefreshingData() // Mulai mengambil data API jika switch ON
-            } else {
-                stopRefreshingData() // Hentikan pengambilan data API jika switch OFF
-            }
+            if (isChecked) startRefreshingData()
+            else stopRefreshingData()
         }
+
+        detailCuaca.setOnClickListener {
+            val intent = Intent(requireContext(), HomeCuaca::class.java)
+            startActivity(intent)
+        }
+
+        infoIcon1.setOnClickListener {
+            val dialog = LogMonitoringDialog()
+            dialog.show(parentFragmentManager, "LogMonitoringDialog")
+        }
+
 
         return view
     }
 
-    // Fungsi untuk mulai mengambil data kelembaban setiap interval
     private fun startRefreshingData() {
-        isRunning = true // Tandakan bahwa pemanggilan API sedang berjalan
-        apiCallInProgress = true // Tandakan bahwa API sedang dipanggil
+        isRunning = true
+        apiCallInProgress = true
         val runnable = object : Runnable {
             override fun run() {
                 if (isRunning && apiCallInProgress) {
-                    getSensor1Data() // Ambil data kelembaban Sensor 1
-                    getSensor2Data() // Ambil data kelembaban Sensor 2
-                    getAvgSensor3Data() // Ambil data kelembaban Avg Sensor 3
-                    handler.postDelayed(this, interval) // Menjalankan lagi setelah interval
+                    getSensor1Data()
+                    getSensor2Data()
+                    getAvgSensor3Data()
+                    getTemperatureFromBMKG()
+                    handler.postDelayed(this, interval)
                 }
             }
         }
-        handler.post(runnable) // Menjalankan tugas pertama
+        handler.post(runnable)
     }
 
-    // Fungsi untuk menghentikan pemanggilan API dan reset TextView
     private fun stopRefreshingData() {
-        isRunning = false // Tandakan bahwa pemanggilan API dihentikan
-        apiCallInProgress = false // Tandakan bahwa pemanggilan API dihentikan
-        handler.removeCallbacksAndMessages(null) // Hentikan semua tugas yang tertunda
+        isRunning = false
+        apiCallInProgress = false
+        handler.removeCallbacksAndMessages(null)
     }
 
-    // Fungsi untuk mengambil data kelembaban Sensor 1 dari API
     private fun getSensor1Data() {
+        startTimeSensor1 = System.currentTimeMillis()
         RetrofitClient.apiServiceSensor1.getSensor1Humidity().enqueue(object : Callback<Double> {
             override fun onResponse(call: Call<Double>, response: Response<Double>) {
-                if (response.isSuccessful) {
-                    val humidity = response.body()
-                    if (humidity != null) {
-                        animateHumidityChange(kelembabanTextView1, humidity) // Animasi perubahan kelembaban
-                        updateKelembabanTextView(kelembabanTextView1, humidity) // Update kelembaban TextView
-                    } else {
-                        showError("Data tidak valid untuk Sensor 1")
-                    }
+                val endTime = System.currentTimeMillis()
+                val humidity = response.body()
+                if (response.isSuccessful && humidity != null) {
+                    val duration = endTime - startTimeSensor1
+                    Log.d("API_TIMING", "Sensor1 response in $duration ms")
+                    LogCollector.addLog("Sensor1 response in $duration ms")  // Menambahkan log ke LogCollector
+                    animateHumidityChange(kelembabanTextView1, humidity)
+                    updateKelembabanTextView(kelembabanTextView1, humidity)
                 } else {
-                    showError("Failed to get data for Sensor 1, Error code: ${response.code()}")
+                    showError("Data tidak valid untuk Sensor 1")
                 }
             }
 
             override fun onFailure(call: Call<Double>, t: Throwable) {
+                val endTime = System.currentTimeMillis()
+                val errorMsg = "Sensor1 failed after ${endTime - startTimeSensor1} ms: ${t.message}"
+                Log.e("API_TIMING", errorMsg)
+                LogCollector.addLog(errorMsg)  // Menambahkan log ke LogCollector
                 showError("Error: ${t.message} for Sensor 1")
             }
         })
     }
 
-    // Fungsi untuk mengambil data kelembaban Sensor 2 dari API
     private fun getSensor2Data() {
+        startTimeSensor2 = System.currentTimeMillis()
         RetrofitClient.apiServiceSensor2.getSensor2Humidity().enqueue(object : Callback<Double> {
             override fun onResponse(call: Call<Double>, response: Response<Double>) {
-                if (response.isSuccessful) {
-                    val humidity = response.body()
-                    if (humidity != null) {
-                        animateHumidityChange(kelembabanTextView2, humidity) // Animasi perubahan kelembaban
-                        updateKelembabanTextView(kelembabanTextView2, humidity) // Update kelembaban TextView
-                    } else {
-                        showError("Data tidak valid untuk Sensor 2")
-                    }
+                val endTime = System.currentTimeMillis()
+                val humidity = response.body()
+                if (response.isSuccessful && humidity != null) {
+                    val duration = endTime - startTimeSensor2
+                    val logMessage = "Sensor2 response in $duration ms"
+                    Log.d("API_TIMING", logMessage)
+                    LogCollector.addLog(logMessage)  // Menambahkan log ke LogCollector
+                    animateHumidityChange(kelembabanTextView2, humidity)
+                    updateKelembabanTextView(kelembabanTextView2, humidity)
                 } else {
-                    showError("Failed to get data for Sensor 2, Error code: ${response.code()}")
+                    showError("Data tidak valid untuk Sensor 2")
                 }
             }
 
             override fun onFailure(call: Call<Double>, t: Throwable) {
+                val endTime = System.currentTimeMillis()
+                val errorMsg = "Sensor2 failed after ${endTime - startTimeSensor2} ms: ${t.message}"
+                Log.e("API_TIMING", errorMsg)
+                LogCollector.addLog(errorMsg)  // Menambahkan log ke LogCollector
                 showError("Error: ${t.message} for Sensor 2")
             }
         })
     }
 
-    // Fungsi untuk mengambil data kelembaban Avg Sensor 3 dari API
+
     private fun getAvgSensor3Data() {
+        startTimeSensor3 = System.currentTimeMillis()
         RetrofitClient.apiServiceSensor3.getAvgSensorHumidity().enqueue(object : Callback<Double> {
             override fun onResponse(call: Call<Double>, response: Response<Double>) {
-                if (response.isSuccessful) {
-                    val humidity = response.body()
-                    if (humidity != null) {
-                        animateHumidityChange(kelembabanTextView3, humidity) // Animasi perubahan kelembaban
-                        updateKelembabanTextView(kelembabanTextView3, humidity) // Update kelembaban TextView
-                    } else {
-                        showError("Data tidak valid untuk Avg Sensor 3")
-                    }
+                val endTime = System.currentTimeMillis()
+                val humidity = response.body()
+                if (response.isSuccessful && humidity != null) {
+                    val duration = endTime - startTimeSensor3
+                    val logMessage = "Sensor3 (avg) response in $duration ms"
+                    Log.d("API_TIMING", logMessage)
+                    LogCollector.addLog(logMessage)  // Menambahkan log ke LogCollector
+                    animateHumidityChange(kelembabanTextView3, humidity)
+                    updateKelembabanTextView(kelembabanTextView3, humidity)
                 } else {
-                    showError("Failed to get data for Avg Sensor 3, Error code: ${response.code()}")
+                    showError("Data tidak valid untuk Avg Sensor 3")
                 }
             }
 
             override fun onFailure(call: Call<Double>, t: Throwable) {
+                val endTime = System.currentTimeMillis()
+                val errorMsg = "Sensor3 (avg) failed after ${endTime - startTimeSensor3} ms: ${t.message}"
+                Log.e("API_TIMING", errorMsg)
+                LogCollector.addLog(errorMsg)  // Menambahkan log ke LogCollector
                 showError("Error: ${t.message} for Avg Sensor 3")
             }
         })
     }
 
-    // Fungsi untuk animasi perubahan kelembaban
+
+
+    private fun getTemperatureFromBMKG() {
+        startTimeBMKG = System.currentTimeMillis()
+        val adm4Code = "32.04.32.1001"
+        BMKGApiService.instance.getWeatherForecast(adm4Code)
+            .enqueue(object : Callback<WeatherResponse> {
+                override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
+                    val endTime = System.currentTimeMillis()
+                    val duration = endTime - startTimeBMKG
+
+                    if (response.isSuccessful) {
+                        val weatherResponse = response.body()
+                        val temp = weatherResponse?.data
+                            ?.firstOrNull()
+                            ?.cuaca
+                            ?.firstOrNull()
+                            ?.firstOrNull()
+                            ?.t
+
+                        val currentTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+
+                        if (temp != null) {
+                            temperatureTextView.text = "$temp°C"
+                            val logMessage = "BMKG temperature response in $duration ms"
+                            Log.d("API_TIMING", logMessage)
+                            LogCollector.addLog(logMessage)  // Menambahkan log ke LogCollector
+                            Log.d("BMKG_TEMPERATURE", "[$currentTime] Suhu saat ini: $temp°C")
+                        } else {
+                            showError("Data suhu tidak tersedia dalam respons BMKG.")
+                            Log.e("BMKG_TEMPERATURE", "[$currentTime] Suhu tidak ditemukan di respons.")
+                        }
+                    } else {
+                        showError("Gagal mengambil data cuaca dari BMKG (kode ${response.code()}).")
+                        val errorMsg = "Response tidak sukses: ${response.code()}"
+                        Log.e("BMKG_TEMPERATURE", errorMsg)
+                        LogCollector.addLog(errorMsg)  // Menambahkan log ke LogCollector
+                    }
+                }
+
+                override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+                    val endTime = System.currentTimeMillis()
+                    val errorMsg = "BMKG temperature failed after ${endTime - startTimeBMKG} ms: ${t.message}"
+                    Log.e("API_TIMING", errorMsg)
+                    LogCollector.addLog(errorMsg)  // Menambahkan log ke LogCollector
+                    showError("Gagal menghubungi API BMKG: ${t.message}")
+                }
+            })
+    }
+
+
+
+
     private fun animateHumidityChange(textView: TextView, humidity: Double) {
         val currentText = textView.text.toString()
-        // Ambil nilai kelembaban yang sudah ditampilkan sebelumnya
         val currentHumidity = currentText.substringBefore("%").toDoubleOrNull()
-
-        // Jika currentHumidity null atau tidak valid, gunakan nilai kelembaban baru
         val startHumidity = currentHumidity ?: humidity
 
-        // Lakukan animasi perubahan dari startHumidity ke humidity baru
         val animator = ValueAnimator.ofFloat(startHumidity.toFloat(), humidity.toFloat())
-        animator.duration = 500 // Durasi animasi dalam milidetik
+        animator.duration = 500
         animator.addUpdateListener { animation ->
             val animatedValue = animation.animatedValue as Float
-            textView.text = String.format("%.2f%%", animatedValue)  // Update kelembaban
+            textView.text = String.format("%.2f%%", animatedValue)
         }
-        animator.start() // Mulai animasi
+        animator.start()
     }
 
-    // Fungsi untuk memperbarui TextView kelembaban
     private fun updateKelembabanTextView(textView: TextView, humidity: Double) {
-        textView.text = String.format("%.2f%%", humidity)  // Update kelembaban TextView
+        textView.text = String.format("%.2f%%", humidity)
     }
 
-    // Fungsi untuk menampilkan pesan kesalahan
     private fun showError(message: String) {
         val currentTime = System.currentTimeMillis()
-        // Cek apakah 30 detik sudah berlalu sejak pesan kesalahan terakhir ditampilkan
         if (currentTime - lastErrorTime >= 30000) {
-            // Jika sudah lebih dari 30 detik, tampilkan Toast dan update waktu terakhir pesan ditampilkan
-            activeToast?.cancel() // Batalkan Toast yang sedang aktif
+            activeToast?.cancel()
             activeToast = Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
             activeToast?.show()
-            lastErrorTime = currentTime // Update waktu terakhir
+            lastErrorTime = currentTime
         }
     }
 
-    // Fungsi untuk animasi kelembabanTextView yang hilang dan muncul dari kiri
     private fun animateTextAppear(textView: TextView) {
         when (textView) {
             kelembabanTextView1 -> {
-                // Animasi untuk kelembabanTextView1 (muncul dari kiri ke kanan)
                 val alphaAnimator = ObjectAnimator.ofFloat(textView, "alpha", 0f, 1f)
-                alphaAnimator.duration = 1500 // Durasi animasi transparansi 1.5 detik
+                alphaAnimator.duration = 1500
 
                 val translationXAnimator = ObjectAnimator.ofFloat(textView, "translationX", -1000f, 0f)
-                translationXAnimator.duration = 1500 // Durasi animasi pergerakan 1.5 detik
+                translationXAnimator.duration = 1500
 
                 alphaAnimator.start()
                 translationXAnimator.start()
             }
-
             kelembabanTextView2 -> {
-                // Animasi untuk kelembabanTextView2 (muncul dari kanan ke kiri)
                 val alphaAnimator = ObjectAnimator.ofFloat(textView, "alpha", 0f, 1f)
-                alphaAnimator.duration = 1500 // Durasi animasi transparansi 1.5 detik
+                alphaAnimator.duration = 1500
 
                 val translationXAnimator = ObjectAnimator.ofFloat(textView, "translationX", 1000f, 0f)
-                translationXAnimator.duration = 1500 // Durasi animasi pergerakan 1.5 detik
+                translationXAnimator.duration = 1500
 
                 alphaAnimator.start()
                 translationXAnimator.start()

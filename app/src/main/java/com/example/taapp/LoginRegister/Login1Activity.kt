@@ -36,6 +36,7 @@ class Login1Activity : AppCompatActivity() {
         val passwordEditText = findViewById<EditText>(R.id.pass)
         val signUpButton = findViewById<Button>(R.id.signup)
         val createText = findViewById<TextView>(R.id.create) // Assuming the ID is 'create'
+        val forgotText = findViewById<TextView>(R.id.forgot)
 
         // Set onClickListener for the Sign In button (Login)
         signUpButton.setOnClickListener {
@@ -60,6 +61,11 @@ class Login1Activity : AppCompatActivity() {
         // Set onClickListener for the "Create" button to navigate to RegisterActivity
         createText.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java) // Navigate to RegisterActivity
+            startActivity(intent)
+        }
+
+        forgotText.setOnClickListener {
+            val intent = Intent(this, ForgotPass::class.java)
             startActivity(intent)
         }
     }
@@ -113,18 +119,22 @@ class Login1Activity : AppCompatActivity() {
         editor.apply()
     }
 
+    private fun clearSavedCredentials() {
+        val sharedPreferences = getSharedPreferences("user_preferences", MODE_PRIVATE)
+        sharedPreferences.edit().clear().apply()
+    }
+
     // Function to login the user using Firebase Authentication
     private fun loginUser(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // If login is successful, navigate to MainActivity
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
-                    finish() // Close the current activity so user cannot go back
+                    finish()
                 } else {
-                    // If login fails, show a toast with the error message
-                    Toast.makeText(this, "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                    clearSavedCredentials() // ⬅️ Hapus password lama
+                    Toast.makeText(this, "Login gagal. Password mungkin telah diubah. Silakan login ulang.", Toast.LENGTH_LONG).show()
                 }
             }
     }

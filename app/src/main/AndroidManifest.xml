@@ -2,11 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -39,27 +43,60 @@
             android:name=".LoginRegister.StartActivity"
             android:exported="false" />
 
+
         <activity android:name=".LoginRegister.RegisterActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
 
         <activity android:name=".LoginRegister.Login1Activity"/>
 
-        <activity android:name=".LoginRegister.AuthActivity"
-            android:exported="false"/>
+        <activity android:name=".LoginRegister.ForgotPass" />
+
+        <activity android:name=".Home.Log.LogMonitoring"/>
 
         <activity android:name=".Home"
             android:exported="false"/>
 
-        <activity android:name=".Profile.Profile2" />
+        <activity android:name=".Home.DetailCuaca.HomeCuaca"
+            android:exported="false"/>
 
+
+        <activity
+            android:name="androidx.fragment.app.testing.EmptyFragmentActivity"
+            android:exported="true"
+            tools:ignore="MissingClass" />
+
+
+        <activity android:name=".Profile.Profile2" />
         <service
-            android:name=".FirebaseCloudMessaging"
+            android:name=".MyFirebaseMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <service
+            android:name=".FCM.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        
+
+        <service
+            android:name=".NotificationService"
+            android:exported="false" />
+
+        <receiver
+            android:enabled="true"
+            android:exported="false"
+            android:name=".BootBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
 
     </application>

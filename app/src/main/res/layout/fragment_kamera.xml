@@ -78,20 +78,4 @@
         app:layout_constraintTop_toBottomOf="@id/cameraSpinner"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
-    <!-- Chat Button -->
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/chat"
-        android:layout_width="250dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="#1F41BB"
-        android:gravity="center"
-        android:text="Chat"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.508"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toggleSwitch"
-        app:layout_constraintVertical_bias="0.195" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="12dp"
+    android:background="@drawable/rounded_spinner"
+    android:elevation="2dp">
+
+    <!-- Search Bar -->
+    <AutoCompleteTextView
+        android:id="@+id/autoCompleteSearch"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="Cari Lokasi"
+        android:padding="8dp"
+        android:background="@drawable/rounded_spinner"
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:drawableStart="@android:drawable/ic_menu_search"
+        android:inputType="text"
+        android:completionThreshold="1" />
+
+    <!-- Title for Location List -->
+    <TextView
+        android:id="@+id/textLocationLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Daftar Lokasi:"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginTop="12dp"
+        android:textColor="@android:color/black" />
+
+    <!-- Horizontal scrollable container with GridLayout inside -->
+    <HorizontalScrollView
+        android:id="@+id/locationListScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:scrollbars="horizontal">
+
+        <GridLayout
+            android:id="@+id/locationListContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:rowCount="3"
+            android:columnCount="4"
+            android:padding="8dp" />
+    </HorizontalScrollView>
+</LinearLayout>
