@@ -52,12 +52,19 @@
 
         <activity android:name=".LoginRegister.ForgotPass" />
 
-        <activity android:name=".Home.Log.LogMonitoring"/>
+        <activity android:name=".Home.Log.LogMonitoring"
+            tools:ignore="MissingClass" />
 
         <activity android:name=".Home"
-            android:exported="false"/>
+            android:exported="false"
+            tools:ignore="MissingClass" />
 
         <activity android:name=".Home.DetailCuaca.HomeCuaca"
+            android:exported="false"/>
+
+        <activity android:name=".Admin.AdminDashboard"
+            android:exported="false"/>
+        <activity android:name=".Admin.AdminEditUser"
             android:exported="false"/>
 
 

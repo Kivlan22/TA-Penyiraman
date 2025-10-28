@@ -26,6 +26,7 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
     private lateinit var registerButton: Button
     private lateinit var signInText: TextView
     private lateinit var Auth: TextView
+    private lateinit var roleInput: AutoCompleteTextView // Role input
 
     private val validIotCodes = listOf(
         "IoT123456", "IoT234567", "IoT345678", "IoT456789", "IoT567890", "IoT678901",
@@ -41,6 +42,7 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
 
         auth = FirebaseAuth.getInstance()
 
+        // Find views by ID
         nameInput = findViewById(R.id.nameInput)
         emailInput = findViewById(R.id.emailInput)
         passwordInput = findViewById(R.id.passwordInput)
@@ -50,6 +52,12 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
         registerButton = findViewById(R.id.registerButton)
         signInText = findViewById(R.id.signInText)
         Auth = findViewById(R.id.Auth)
+        roleInput = findViewById(R.id.roleInput) // Initialize role input
+
+        // Setting up role dropdown
+        val roles = listOf("Admin", "User")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, roles)
+        roleInput.setAdapter(adapter)
 
         signInText.setOnClickListener {
             startActivity(Intent(this, Login1Activity::class.java))
@@ -63,6 +71,7 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
             val confPassword = confPasswordInput.text.toString().trim()
             val iotCode = iotCodeInput.text.toString().trim()
             val phone = phoneInput.text.toString().trim()
+            val role = roleInput.text.toString().trim() // Get the role
 
             val dialog = AuthDialogFragment().apply {
                 arguments = Bundle().apply {
@@ -72,6 +81,7 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
                     putString("confpass", confPassword)
                     putString("iotcode", iotCode)
                     putString("phone", phone)
+                    putString("role", role) // Add role to dialog arguments
                 }
             }
             dialog.show(supportFragmentManager, "AuthDialog")
@@ -84,9 +94,10 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
             val confPassword = confPasswordInput.text.toString().trim()
             val iotCode = iotCodeInput.text.toString().trim()
             val phone = phoneInput.text.toString().trim()
+            val role = roleInput.text.toString().trim() // Get selected role
 
             if (validateInput(name, email, password, confPassword, iotCode, phone)) {
-                registerUser(name, email, password, iotCode, phone)
+                registerUser(name, email, password, iotCode, phone, role)
                 sendOtpToPhone(phone)
             }
         }
@@ -108,7 +119,7 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
         return true
     }
 
-    private fun registerUser(name: String, email: String, password: String, iotCode: String, phone: String) {
+    private fun registerUser(name: String, email: String, password: String, iotCode: String, phone: String, role: String) {
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val userId = auth.currentUser?.uid
@@ -118,16 +129,17 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
                         "name" to name,
                         "email" to email,
                         "iotCode" to iotCode,
-                        "phone" to phone
+                        "phone" to phone,
+                        "role" to role // Save role to Firebase
                     )
 
-                    // Menyimpan data pengguna ke Realtime Database
+                    // Save user data to Firebase Realtime Database
                     database.child("Users").child(userId).setValue(userMap).addOnCompleteListener { dbTask ->
                         if (dbTask.isSuccessful) {
                             Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
                             Log.d("RegisterActivity", "Data saved to Firebase")
 
-                            // Kirim OTP setelah registrasi
+                            // Send OTP after registration
                             sendOtpToPhone(phone)
                         } else {
                             Toast.makeText(this, "Failed to save data: ${dbTask.exception?.message}", Toast.LENGTH_SHORT).show()
@@ -156,7 +168,6 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
             return
         }
 
-
         val options = PhoneAuthOptions.newBuilder(auth)
             .setPhoneNumber(formattedPhone)
             .setTimeout(60L, TimeUnit.SECONDS)
@@ -179,7 +190,7 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
                 override fun onCodeSent(verificationId: String, token: PhoneAuthProvider.ForceResendingToken) {
                     Log.d("RegisterActivity", "Code sent to: $formattedPhone, verificationId=$verificationId")
 
-                    // Simpan verificationId untuk verifikasi kode OTP
+                    // Save verificationId for OTP verification
                     val dialog = AuthDialogFragment().apply {
                         arguments = Bundle().apply {
                             putString("verificationId", verificationId)
@@ -202,6 +213,6 @@ class RegisterActivity : AppCompatActivity(), AuthDialogFragment.AuthDialogListe
         super.onBackPressed()
         startActivity(Intent(this, StartActivity::class.java))
         finish()
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right)
     }
 }

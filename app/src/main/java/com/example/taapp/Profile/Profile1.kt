@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.example.taapp.Admin.AdminDashboard
 import com.example.taapp.LoginRegister.StartActivity
 import com.example.taapp.R
 import com.google.firebase.auth.FirebaseAuth
@@ -28,7 +29,7 @@ class Profile1 : Fragment() {
         val view = inflater.inflate(R.layout.fragment_profile1, container, false)
 
         auth = FirebaseAuth.getInstance()
-
+        val roleButton: TextView = view.findViewById(R.id.roleAccount)
         val editButton: Button = view.findViewById(R.id.edit)
         val logoutButton: Button = view.findViewById(R.id.logoutButton)
         val nameAccountTextView: TextView = view.findViewById(R.id.nameAccount)
@@ -86,6 +87,10 @@ class Profile1 : Fragment() {
 
         editButton.setOnClickListener {
             val intent = Intent(requireContext(), Profile2::class.java)
+            startActivity(intent)
+        }
+        roleButton.setOnClickListener {
+            val intent = Intent(requireContext(), AdminDashboard::class.java)
             startActivity(intent)
         }
 

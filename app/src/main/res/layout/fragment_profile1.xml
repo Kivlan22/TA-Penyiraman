@@ -58,7 +58,7 @@
         <!-- Name Account -->
         <TextView
             android:id="@+id/nameAccount"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
@@ -67,16 +67,29 @@
             android:textStyle="bold"
             android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/imageAccount" />
+
+        <TextView
+            android:id="@+id/roleAccount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Info Role"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#1F41BB"
+            app:layout_constraintTop_toBottomOf="@id/nameAccount"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Button Layout -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/button_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/nameAccount">
+            app:layout_constraintTop_toBottomOf="@id/roleAccount">
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/edit"
@@ -113,13 +126,13 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp">
 
-
+            <!-- IoT Code Input Layout -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/iotCodeInputLayout"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:background="#F1F4FF"
                 android:hint="IoT Code"
                 android:textColorHint="#626262"
@@ -136,7 +149,7 @@
                     android:drawableRight="@drawable/baseline_code_24" />
             </com.google.android.material.textfield.TextInputLayout>
 
-
+            <!-- Email Input Layout -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/email1"
                 android:layout_width="300dp"
@@ -159,6 +172,7 @@
                     android:drawableRight="@drawable/baseline_email_24" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Phone Number Input Layout -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/phoneInput"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -182,29 +196,28 @@
                     android:drawableRight="@drawable/baseline_local_phone_24"/>
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Button Layout with Logout Button -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/button_layout_logout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/NestedScrollView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/logoutButton"
+                    android:layout_width="160dp"
+                    android:layout_height="60dp"
+                    android:backgroundTint="#FF0000"
+                    android:text="Logout"
+                    android:textColor="@color/white"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/button_layout_logout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/NestedScrollView"
-        tools:layout_editor_absoluteX="1dp">
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/logoutButton"
-            android:layout_width="160dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="8dp"
-            android:backgroundTint="#FF0000"
-            android:text="Logout"
-            android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:ignore="MissingConstraints" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
